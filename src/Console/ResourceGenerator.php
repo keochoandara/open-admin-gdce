@@ -3,6 +3,8 @@
 namespace OpenAdmin\Admin\Console;
 
 use Illuminate\Database\Eloquent\Model;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Configuration;
 
 class ResourceGenerator
 {
@@ -211,20 +213,72 @@ class ResourceGenerator
      *
      * @return \Doctrine\DBAL\Schema\Column[]
      */
+    // protected function getTableColumns()
+    // {
+    //     if (!$this->model->getConnection()->isDoctrineAvailable()) {
+    //         throw new \Exception(
+    //             'You need to require doctrine/dbal: ~2.3 in your own composer.json to get database columns. '
+    //         );
+    //     }
+
+    //     $table = $this->model->getConnection()->getTablePrefix().$this->model->getTable();
+    //     /** @var \Doctrine\DBAL\Schema\MySqlSchemaManager $schema */
+    //     $schema = $this->model->getConnection()->getDoctrineSchemaManager($table);
+
+    //     // custom mapping the types that doctrine/dbal does not support
+    //     $databasePlatform = $schema->getDatabasePlatform();
+
+    //     foreach ($this->doctrineTypeMapping as $doctrineType => $dbTypes) {
+    //         foreach ($dbTypes as $dbType) {
+    //             $databasePlatform->registerDoctrineTypeMapping($dbType, $doctrineType);
+    //         }
+    //     }
+
+    //     $database = null;
+    //     if (strpos($table, '.')) {
+    //         list($database, $table) = explode('.', $table);
+    //     }
+
+    //     return $schema->listTableColumns($table, $database);
+    // }
+
+
+    /**
+     * Get columns of a giving model.
+     *
+     * @throws \Exception
+     *
+     * @return \Doctrine\DBAL\Schema\Column[]
+     */
     protected function getTableColumns()
     {
-        if (!$this->model->getConnection()->isDoctrineAvailable()) {
+         // Check if Doctrine is available
+        if (!class_exists(\Doctrine\DBAL\Connection::class)) {
             throw new \Exception(
-                'You need to require doctrine/dbal: ~2.3 in your own composer.json to get database columns. '
+                'You need to require doctrine/dbal in your composer.json to get database columns.'
             );
         }
 
-        $table = $this->model->getConnection()->getTablePrefix().$this->model->getTable();
-        /** @var \Doctrine\DBAL\Schema\MySqlSchemaManager $schema */
-        $schema = $this->model->getConnection()->getDoctrineSchemaManager($table);
+        // Get the database connection details
+        $connection = $this->model->getConnection();
+        $config = new Configuration();
+        $connectionParams = [
+            'dbname' => $connection->getDatabaseName(),
+            'user' => $connection->getConfig('username'),
+            'password' => $connection->getConfig('password'),
+            'host' => $connection->getConfig('host'),
+            'driver' => $connection->getDriverName(),
+            'port' => $connection->getConfig('port'),
+        ];
 
-        // custom mapping the types that doctrine/dbal does not support
-        $databasePlatform = $schema->getDatabasePlatform();
+        // Create the Doctrine DBAL connection
+        $doctrineConnection = DriverManager::getConnection($connectionParams, $config);
+
+        // Get the Schema Manager from Doctrine
+        $schemaManager = $doctrineConnection->createSchemaManager();
+
+        // Map custom database types to Doctrine types
+        $databasePlatform = $doctrineConnection->getDatabasePlatform();
 
         foreach ($this->doctrineTypeMapping as $doctrineType => $dbTypes) {
             foreach ($dbTypes as $dbType) {
@@ -232,12 +286,15 @@ class ResourceGenerator
             }
         }
 
-        $database = null;
-        if (strpos($table, '.')) {
-            list($database, $table) = explode('.', $table);
+        // Handle table names with database prefixes
+        $table = $this->model->getConnection()->getTablePrefix() . $this->model->getTable();
+        $database = $connection->getDatabaseName();
+        if (strpos($table, '.') !== false) {
+            [$database, $table] = explode('.', $table);
         }
 
-        return $schema->listTableColumns($table, $database);
+        // Return the table columns
+        return $schemaManager->listTableColumns($table, $database);
     }
 
     /**
