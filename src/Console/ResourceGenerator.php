@@ -5,6 +5,7 @@ namespace OpenAdmin\Admin\Console;
 use Illuminate\Database\Eloquent\Model;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Types\Type;
 
 class ResourceGenerator
 {
@@ -89,7 +90,11 @@ class ResourceGenerator
             if (in_array($name, $reservedColumns)) {
                 continue;
             }
-            $type = $column->getType()->getName();
+            
+            // $type = $column->getType()->getName();
+            $type_obj = $column->getType();
+            $type = Type::lookupName($type_obj);
+
             $default = $column->getDefault();
 
             $defaultValue = '';
