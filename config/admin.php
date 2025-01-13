@@ -75,7 +75,7 @@ return [
     | be set before running `artisan admin::install` to take effect.
     |
     */
-    'directory' => app_path('Api'),
+    'directory' => app_path('Admin'),
 
     /*
     |--------------------------------------------------------------------------
