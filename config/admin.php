@@ -62,7 +62,7 @@ return [
 
         'namespace' => 'App\\Admin\\Controllers',
 
-        'middleware' => ['api', 'admin'],
+        'middleware' => ['api'],
     ],
 
     /*
