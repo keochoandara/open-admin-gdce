@@ -654,4 +654,9 @@ HTML;
 
         return view($this->view, $this->variables());
     }
+
+    public function getVariables()
+    {
+        return $this->variables();
+    }
 }

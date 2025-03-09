@@ -77,7 +77,7 @@ trait HasHooks
             if (!$func instanceof Closure) {
                 continue;
             }
-
+            
             $response = call_user_func($func, $this, $parameters);
 
             if ($response instanceof Response) {

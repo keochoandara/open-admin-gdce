@@ -106,7 +106,12 @@ class File extends Field
             return request($this->column.Field::FILE_ADD_FLAG);
         }
 
+
         if (!empty($file)) {
+            if (!$file instanceof UploadedFile) {
+                return $file;
+            }
+
             $this->name = $this->getStoreName($file);
 
             return $this->uploadAndDeleteOriginal($file);

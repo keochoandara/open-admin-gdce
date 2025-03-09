@@ -32,6 +32,11 @@ class Select extends Presenter
     protected $additional_script = '';
 
     /**
+     * @var string
+     */
+    protected $type = 'select';
+
+    /**
      * Select constructor.
      *
      * @param mixed $options
@@ -216,6 +221,8 @@ JS;
         return [
             'options' => $this->buildOptions(),
             'class'   => $this->getElementClass(),
+            'group' => $this->filter->group,
+            'type'    => $this->type,
         ];
     }
 

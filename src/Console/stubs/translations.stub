@@ -1,0 +1,13 @@
+<?php
+
+return [
+    'index_title'               => 'DummyTitle',
+    'index_description'         => 'Here\'s a list of your DummyLowerTitles',
+    'show_title'                => 'DummyTitle Detail',
+    'show_description'          => '',
+    'create_title'              => 'Create DummyTitle',
+    'create_description'        => '',
+    'edit_title'                => 'Edit DummyTitle',
+    'edit_description'          => '',
+DummyLabels
+];

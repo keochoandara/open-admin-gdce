@@ -5,7 +5,7 @@ namespace OpenAdmin\Admin\Grid\Filter\Presenter;
 use Illuminate\Support\Arr;
 use OpenAdmin\Admin\Admin;
 
-class DateTime extends Presenter
+class Date extends Presenter
 {
     /**
      * @var array
@@ -15,12 +15,12 @@ class DateTime extends Presenter
     /**
      * @var string
      */
-    protected $format = 'YYYY-MM-DD HH:mm:ss';
+    protected $format = 'YYYY-MM-DD';
 
     /**
      * @var string
      */
-    protected $type = 'datetime';
+    protected $type = 'date';
 
     /**
      * DateTime constructor.

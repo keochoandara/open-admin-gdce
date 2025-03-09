@@ -20,6 +20,11 @@ class Radio extends Presenter
     protected $inline = true;
 
     /**
+     * @var string
+     */
+    protected $type = 'radio';
+
+    /**
      * Radio constructor.
      *
      * @param array $options
@@ -63,6 +68,8 @@ class Radio extends Presenter
         return [
             'options' => $this->options,
             'inline'  => $this->inline,
+            'group' => $this->filter->group,
+            'type'        => $this->type,
         ];
     }
 }

@@ -7,6 +7,11 @@ use OpenAdmin\Admin\Facades\Admin;
 class MultipleSelect extends Select
 {
     /**
+     * @var string
+     */
+    protected $type = 'multiple_select';
+
+    /**
      * Load options for other select when change.
      *
      * @param string $target

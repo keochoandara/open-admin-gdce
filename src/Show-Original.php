@@ -532,14 +532,4 @@ class Show implements Renderable
 
         return view('admin::show', $data)->render();
     }
-
-    public function getFields()
-    {
-        return $this->fields;
-    }
-
-    public function getPanel()
-    {
-        return $this->panel;
-    }
 }

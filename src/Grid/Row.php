@@ -210,4 +210,10 @@ class Row
 
         return $value;
     }
+
+    public function getData()
+    {
+        return $this->data;
+    }
+
 }

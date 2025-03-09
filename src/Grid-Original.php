@@ -17,7 +17,7 @@ use OpenAdmin\Admin\Grid\Row;
 use OpenAdmin\Admin\Grid\Tools;
 use OpenAdmin\Admin\Traits\ShouldSnakeAttributes;
 
-class Grid
+class GridOriginal
 {
     use Concerns\HasElementNames,
         Concerns\HasHeader,
@@ -51,7 +51,7 @@ class Grid
      *
      * @var \Illuminate\Support\Collection
      */
-    private $columns;
+    protected $columns;
 
     /**
      * Collection of all data rows.
@@ -776,7 +776,7 @@ class Grid
             $relation instanceof Relations\MorphOne
         ) {
             $this->model()->with($method);
-            
+
             return $this->addColumn($method, $label)->setRelation(
                 $this->shouldSnakeAttributes() ? Str::snake($method) : $method
             );
@@ -949,25 +949,5 @@ class Grid
         $this->callRenderingCallback();
 
         return Admin::component($this->view, $this->variables());
-    }
-
-    public function getRows()
-    {
-        return $this->rows;
-    }
-
-    public function getModel()
-    {
-        return $this->model;
-    }
-
-    public function getPerPages()
-    {
-        return $this->perPages;
-    }
-
-    public function getTools() 
-    {
-        return $this->tools;
     }
 }

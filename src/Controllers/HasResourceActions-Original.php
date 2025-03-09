@@ -15,7 +15,7 @@ trait HasResourceActions
         if (method_exists($this, 'hasHooks') && $this->hasHooks('alterForm')) {
             $form = $this->callHooks('alterForm', $form);
         }
-        
+
         return $form;
     }
 

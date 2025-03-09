@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use OpenAdmin\Admin\Grid\Filter;
 use OpenAdmin\Admin\Grid\Filter\Presenter\Checkbox;
 use OpenAdmin\Admin\Grid\Filter\Presenter\DateTime;
+use OpenAdmin\Admin\Grid\Filter\Presenter\Date;
 use OpenAdmin\Admin\Grid\Filter\Presenter\MultipleSelect;
 use OpenAdmin\Admin\Grid\Filter\Presenter\Presenter;
 use OpenAdmin\Admin\Grid\Filter\Presenter\Radio;
@@ -47,7 +48,7 @@ abstract class AbstractFilter
     /**
      * @var array|string
      */
-    protected $value;
+    public $value;
 
     /**
      * @var array|string
@@ -57,7 +58,7 @@ abstract class AbstractFilter
     /**
      * @var string
      */
-    protected $column;
+    public $column;
 
     /**
      * Presenter object.
@@ -318,9 +319,7 @@ abstract class AbstractFilter
      */
     public function date($options = [])
     {
-        $options = array_merge(['format' => 'YYYY-MM-DD'], $options);
-
-        return $this->datetime($options);
+        return $this->setPresenter(new Date($options));
     }
 
     /**
@@ -381,7 +380,7 @@ abstract class AbstractFilter
     protected function setPresenter(Presenter $presenter)
     {
         $presenter->setParent($this);
-
+        
         return $this->presenter = $presenter;
     }
 
@@ -547,5 +546,20 @@ abstract class AbstractFilter
         }
 
         throw new \Exception('Method "'.$method.'" not exists.');
+    }
+
+    /**
+     * Get presenter object of filter.
+     *
+     * @return Presenter
+     */
+    public function getPresenter()
+    {
+        return $this->presenter;
+    }
+
+    public function getLabel()
+    {
+        return $this->label;
     }
 }

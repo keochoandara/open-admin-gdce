@@ -76,7 +76,7 @@ class MakeCommand extends GeneratorCommand
             $path = Str::plural(Str::kebab(class_basename($this->modelName)));
 
             $this->line('');
-            $this->comment('Add the following route to app/Admin/routes.php:');
+            $this->comment('Add the following route to app/CRUD/routes.php:');
             $this->line('');
             $this->info("    \$router->resource('{$path}', {$this->controllerName}::class);");
             $this->line('');
@@ -160,6 +160,7 @@ class MakeCommand extends GeneratorCommand
 
         return str_replace(
             [
+                'DummyName',
                 'DummyModelNamespace',
                 'DummyTitle',
                 'DummyModel',
@@ -168,6 +169,7 @@ class MakeCommand extends GeneratorCommand
                 'DummyForm',
             ],
             [
+                Str::of($this->getTitle())->snake(),
                 $this->modelName,
                 $this->getTitle(),
                 class_basename($this->modelName),

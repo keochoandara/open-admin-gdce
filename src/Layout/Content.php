@@ -379,7 +379,7 @@ class Content implements Renderable
             '_view_'            => $this->view,
             '_user_'            => $this->getUserData(),
         ];
-
+        
         return view('admin::content', $items)->render();
     }
 }

@@ -171,4 +171,9 @@ class Tools implements Renderable
             return (string) $tool;
         })->implode(' ');
     }
+
+    public function getTools() 
+    {
+        return $this->tools;
+    }
 }

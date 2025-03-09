@@ -371,8 +371,12 @@ trait UploadField
      *
      * @return string
      */
-    protected function getStoreName(UploadedFile $file)
+    protected function getStoreName($file)
     {
+        if (!$file instanceof UploadedFile) {
+            return $file;
+        }
+
         if ($this->useUniqueName) {
             return $this->generateUniqueName($file);
         }
@@ -451,6 +455,17 @@ trait UploadField
 
         return $this->storage->putFileAs($this->getDirectory(), $file, $this->name);
     }
+    
+    // protected function upload(UploadedFile $file)
+    // {
+    //     $this->renameIfExists($file);
+
+    //     if (!is_null($this->storagePermission)) {
+    //         return $this->storage->putFileAs($this->getDirectory(), $file, $this->name, $this->storagePermission);
+    //     }
+
+    //     return $this->storage->putFileAs($this->getDirectory(), $file, $this->name);
+    // }
 
     /**
      * If name already exists, rename it.

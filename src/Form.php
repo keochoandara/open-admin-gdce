@@ -344,7 +344,7 @@ class Form implements Renderable
     public function store()
     {
         $data = \request()->all();
-
+        
         // Handle validation errors.
         if ($validationMessages = $this->validationMessages($data)) {
             return $this->responseValidationError($validationMessages);
@@ -353,7 +353,6 @@ class Form implements Renderable
         if (($response = $this->prepare($data)) instanceof Response) {
             return $response;
         }
-
         DB::transaction(function () {
             $inserts = $this->prepareInsert($this->updates);
 
@@ -420,9 +419,8 @@ class Form implements Renderable
     protected function ajaxResponse($message)
     {
         $request = \request();
-
         // ajax but not pjax
-        if ($request->ajax() && !$request->pjax()) {
+        if ($request->expectsJson() || ($request->ajax() && !$request->pjax())) {
             return response()->json([
                 'status'  => true,
                 'message' => $message,
@@ -562,6 +560,14 @@ class Form implements Renderable
 
         // Handle validation errors.
         if ($validationMessages = $this->validationMessages($data)) {
+
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => $validationMessages
+                ], 422);
+            }
+
             if (!$isEditable) {
                 return back()->withInput()->withErrors($validationMessages);
             }
@@ -580,7 +586,7 @@ class Form implements Renderable
                 /* @var Model $this ->model */
                 $this->model->setAttribute($column, $value);
             }
-
+            
             $this->model->save();
 
             $this->updateRelation($this->relations);
@@ -846,7 +852,7 @@ class Form implements Renderable
     protected function prepareUpdate(array $updates, $oneToOneRelation = false, $isRelationUpdate = false): array
     {
         $prepared = [];
-
+        
         /** @var Field $field */
         foreach ($this->fields() as $field) {
             $columns = $field->column();
@@ -1083,12 +1089,16 @@ class Form implements Renderable
     public function validationMessages($input)
     {
         $failedValidators = [];
-
         /** @var Field $field */
         foreach ($this->fields() as $field) {
             if (!$validator = $field->getValidator($input)) {
                 continue;
             }
+
+            if ($this->isEditing() && in_array($field->getType(), ['image', 'file'])) {
+                continue;
+            }
+
             if (($validator instanceof Validator) && !$validator->passes()) {
                 $failedValidators[] = $validator;
             }
@@ -1532,5 +1542,10 @@ class Form implements Renderable
     public function getLayout(): Layout
     {
         return $this->layout;
+    }
+
+    public function getBuilder()
+    {
+        return $this->builder;
     }
 }

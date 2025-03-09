@@ -158,4 +158,9 @@ class Panel implements Renderable
     {
         return view($this->view, $this->data)->render();
     }
+
+    public function getData() 
+    {
+        return $this->data;
+    }
 }

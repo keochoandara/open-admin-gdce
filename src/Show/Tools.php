@@ -272,4 +272,10 @@ HTML;
 
         return $output.$this->renderCustomTools($this->appends);
     }
+
+
+    public function getTools()
+    {
+        return $this->tools;
+    }
 }

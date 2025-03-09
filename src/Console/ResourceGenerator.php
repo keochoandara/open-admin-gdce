@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Types\Type;
+use Illuminate\Support\Str;
+use \Illuminate\Filesystem\Filesystem;
 
 class ResourceGenerator
 {
@@ -14,13 +16,15 @@ class ResourceGenerator
      */
     protected $model;
 
+    protected $resource;
+
     /**
      * @var array
      */
     protected $formats = [
-        'form_field'  => "\$form->%s('%s', __('%s'))",
-        'show_field'  => "\$show->field('%s', __('%s'))",
-        'grid_column' => "\$grid->column('%s', __('%s'))",
+        'form_field'  => "\$form->%s('%s', trans('%s.%s'))",
+        'show_field'  => "\$show->field('%s', trans('%s.%s'))",
+        'grid_column' => "\$grid->column('%s', trans('%s.%s'))",
     ];
 
     /**
@@ -56,6 +60,10 @@ class ResourceGenerator
     public function __construct($model)
     {
         $this->model = $this->getModel($model);
+        
+        $this->resource = $this->getResourceName($model);
+
+        $this->makeTranslations();
     }
 
     /**
@@ -156,7 +164,7 @@ class ResourceGenerator
 
             $label = $this->formatLabel($name);
 
-            $output .= sprintf($this->formats['form_field'], $fieldType, $name, $label);
+            $output .= sprintf($this->formats['form_field'], $fieldType, $name, $this->resource, $label);
 
             if (trim($defaultValue, "'\"")) {
                 $output .= "->default({$defaultValue})";
@@ -178,7 +186,7 @@ class ResourceGenerator
             // set column label
             $label = $this->formatLabel($name);
 
-            $output .= sprintf($this->formats['show_field'], $name, $label);
+            $output .= sprintf($this->formats['show_field'], $name, $this->resource, $label);
 
             $output .= ";\r\n";
         }
@@ -189,12 +197,11 @@ class ResourceGenerator
     public function generateGrid()
     {
         $output = '';
-
         foreach ($this->getTableColumns() as $column) {
             $name = $column->getName();
             $label = $this->formatLabel($name);
 
-            $output .= sprintf($this->formats['grid_column'], $name, $label);
+            $output .= sprintf($this->formats['grid_column'], $name, $this->resource, $label);
             $output .= ";\r\n";
         }
 
@@ -210,43 +217,6 @@ class ResourceGenerator
             'deleted_at',
         ];
     }
-
-    /**
-     * Get columns of a giving model.
-     *
-     * @throws \Exception
-     *
-     * @return \Doctrine\DBAL\Schema\Column[]
-     */
-    // protected function getTableColumns()
-    // {
-    //     if (!$this->model->getConnection()->isDoctrineAvailable()) {
-    //         throw new \Exception(
-    //             'You need to require doctrine/dbal: ~2.3 in your own composer.json to get database columns. '
-    //         );
-    //     }
-
-    //     $table = $this->model->getConnection()->getTablePrefix().$this->model->getTable();
-    //     /** @var \Doctrine\DBAL\Schema\MySqlSchemaManager $schema */
-    //     $schema = $this->model->getConnection()->getDoctrineSchemaManager($table);
-
-    //     // custom mapping the types that doctrine/dbal does not support
-    //     $databasePlatform = $schema->getDatabasePlatform();
-
-    //     foreach ($this->doctrineTypeMapping as $doctrineType => $dbTypes) {
-    //         foreach ($dbTypes as $dbType) {
-    //             $databasePlatform->registerDoctrineTypeMapping($dbType, $doctrineType);
-    //         }
-    //     }
-
-    //     $database = null;
-    //     if (strpos($table, '.')) {
-    //         list($database, $table) = explode('.', $table);
-    //     }
-
-    //     return $schema->listTableColumns($table, $database);
-    // }
-
 
     /**
      * Get columns of a giving model.
@@ -311,6 +281,73 @@ class ResourceGenerator
      */
     protected function formatLabel($value)
     {
-        return ucfirst(str_replace(['-', '_'], ' ', $value));
+        return Str::of($value)->snake();
+    }
+
+    private function getResourceName($model)
+    {
+        return strtolower(class_basename($model));
+    }
+
+    private function getTitle()
+    {
+        return Str::of($this->resource)->headline();
+    }
+
+    private function getTitlePlural()
+    {
+        return Str::of($this->getTitle())->plural()->lower();
+    }
+
+    private function getLabels()
+    {
+        $output = '';
+        foreach ($this->getTableColumns() as $column) {
+            $name = $column->getName();
+            $label = Str::of($this->formatLabel($name))->headline();
+
+            $output .= "'$name'          => '$label'";
+            $output .= ",\r\n";
+        }
+
+        return $output;
+    }
+
+    protected function indentCodes($code)
+    {
+        $indent = str_repeat(' ', 4);
+
+        return rtrim($indent.preg_replace("/\r\n/", "\r\n{$indent}", $code));
+    }
+
+    private function makeTranslations()
+    {
+        $filesystem = new Filesystem();
+
+        $stub = $filesystem->get(__DIR__.'/stubs/translations.stub');
+
+        $content = str_replace(
+            [
+                'DummyTitle',
+                'DummyLowerTitles',
+                'DummyLabels',
+            ],
+            [
+                $this->getTitle(),
+                $this->getTitlePlural(),
+                $this->indentCodes($this->getLabels()),
+            ],
+            $stub
+        );
+
+        $langDirectories = $filesystem->directories(resource_path('lang'));
+
+        foreach ($langDirectories as $directory) {
+            $filePath = $directory . DIRECTORY_SEPARATOR . $this->resource . '.php';
+
+            if (!$filesystem->exists($filePath)) {
+                $filesystem->put($filePath, $content);
+            }
+        }
     }
 }

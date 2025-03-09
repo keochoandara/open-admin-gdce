@@ -1660,4 +1660,36 @@ class Field implements Renderable
     {
         return $this->render()->render();
     }
+
+
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    public function getColumn()
+    {
+        return $this->column;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function getStrRules()
+    {
+        return $this->rules;
+    }
+
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    public function getType()
+    {
+        return strtolower((new \ReflectionClass($this))->getShortName());
+    }
+
 }

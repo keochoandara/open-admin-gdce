@@ -11,7 +11,7 @@ return [
     | login page.
     |
     */
-    'name' => 'Open Admin',
+    'name' => 'GDCE CRUD Backend',
 
     /*
     |--------------------------------------------------------------------------
@@ -22,7 +22,7 @@ return [
     | `img` tag, eg '<img src="http://logo-url" alt="Admin logo">'.
     |
     */
-    'logo' => '<b>Open</b> Admin',
+    'logo' => '<b>GDCE</b> CRUD',
 
     /*
     |--------------------------------------------------------------------------
@@ -34,7 +34,7 @@ return [
     | '<img src="http://logo-url" alt="Admin logo">'.
     |
     */
-    'logo-mini' => '<b>OA</b>',
+    'logo-mini' => '<b>GC</b>',
 
     /*
     |--------------------------------------------------------------------------
@@ -57,12 +57,12 @@ return [
     |
     */
     'route' => [
+ 
+        'prefix' => env('ADMIN_ROUTE_PREFIX', 'api/crud'),
 
-        'prefix' => env('ADMIN_ROUTE_PREFIX', 'api'),
+        'namespace' => 'App\\CRUD\\Controllers',
 
-        'namespace' => 'App\\Admin\\Controllers',
-
-        'middleware' => ['api'],
+        'middleware' => ['auth:api'],
     ],
 
     /*
@@ -75,7 +75,7 @@ return [
     | be set before running `artisan admin::install` to take effect.
     |
     */
-    'directory' => app_path('Admin'),
+    'directory' => app_path('CRUD'),
 
     /*
     |--------------------------------------------------------------------------
@@ -85,7 +85,7 @@ return [
     | Html title for all pages.
     |
     */
-    'title' => 'Admin',
+    'title' => 'GDCE CRUD Backend',
 
     /*
     |--------------------------------------------------------------------------
@@ -110,7 +110,7 @@ return [
     */
     'auth' => [
 
-        'controller' => App\Admin\Controllers\AuthController::class,
+        'controller' => App\CRUD\Controllers\AuthController::class,
 
         'guard' => 'admin',
 

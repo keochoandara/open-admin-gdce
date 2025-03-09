@@ -48,6 +48,11 @@ class Image extends File
             if ($this->picker) {
                 return parent::prepare($file);
             }
+
+            if (!$file instanceof UploadedFile) {
+                return $file;
+            }
+            
             $this->name = $this->getStoreName($file);
 
             $this->callInterventionMethods($file->getRealPath());

@@ -25,7 +25,7 @@ class Column
     /**
      * @var Grid
      */
-    public $grid;
+    protected $grid;
 
     /**
      * Name of column.
@@ -728,5 +728,4 @@ class Column
 
         return $this->resolveDisplayer($method, $arguments);
     }
-
 }

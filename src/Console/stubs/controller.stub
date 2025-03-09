@@ -11,19 +11,15 @@ use OpenAdmin\Admin\Show;
 class DummyClass extends AdminController
 {
     /**
-     * Title for current resource.
-     *
-     * @var string
-     */
-    protected $title = 'DummyTitle';
-
-    /**
      * Make a grid builder.
      *
      * @return Grid
      */
     protected function grid()
     {
+        $this->setTitle("index", trans('DummyName.index_title'));
+        $this->setDescription("index", trans('DummyName.index_description'));
+
         $grid = new Grid(new DummyModel());
 
 DummyGrid
@@ -39,6 +35,9 @@ DummyGrid
      */
     protected function detail($id)
     {
+        $this->setTitle("show", trans('DummyName.show_title'));
+        $this->setDescription("show", trans('DummyName.show_description'));
+
         $show = new Show(DummyModel::findOrFail($id));
 
 DummyShow
@@ -53,6 +52,12 @@ DummyShow
      */
     protected function form()
     {
+        $this->setTitle("create", trans('DummyName.create_title'));
+        $this->setDescription("create", trans('DummyName.create_description'));
+
+        $this->setTitle("edit", trans('DummyName.edit_title'));
+        $this->setDescription("edit", trans('DummyName.edit_description'));
+
         $form = new Form(new DummyModel());
 
 DummyForm

@@ -47,6 +47,11 @@ trait HasQuickSearch
         });
     }
 
+    public function getQuickSearchColumns()
+    {
+        return $this->search;
+    }
+
     /**
      * Apply the search query to the query.
      *

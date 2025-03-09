@@ -108,4 +108,9 @@ class Paginator extends AbstractTool
 
         return view('admin::grid.pagination', $vars)->render();
     }
+
+    public function getPaginator()
+    {
+        return $this->paginator;
+    }
 }
