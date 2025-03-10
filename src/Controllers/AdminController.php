@@ -278,7 +278,7 @@ class AdminController extends Controller
         $result = [];
         $search = $grid->getQuickSearchColumns();
         foreach ($grid->getColumns() as $column) {
-            if (!in_array($column->getName(), $search)) {
+            if (!$search ||!in_array($column->getName(), $search)) {
                 continue;
             }
             array_push($result, [

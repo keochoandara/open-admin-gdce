@@ -1,0 +1,7 @@
+<script setup lang="ts">
+  import { CrudShow } from '@/components/ui/crud'
+</script>
+
+<template>
+  <CrudShow crud-name="DummyResourceName" crud-prefix="DummyPrefix" :id="$route.params.id" />
+</template>

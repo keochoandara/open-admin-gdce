@@ -5,6 +5,7 @@ namespace OpenAdmin\Admin\Console;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use \Illuminate\Filesystem\Filesystem;
 
 class MakeCommand extends GeneratorCommand
 {
@@ -75,6 +76,8 @@ class MakeCommand extends GeneratorCommand
         if (parent::handle() !== false) {
             $path = Str::plural(Str::kebab(class_basename($this->modelName)));
 
+            $this->generateClientPages($path);
+
             $this->line('');
             $this->comment('Add the following route to app/CRUD/routes.php:');
             $this->line('');
@@ -117,7 +120,7 @@ class MakeCommand extends GeneratorCommand
             return $title;
         }
 
-        return __((new \ReflectionClass($this->modelName))->getShortName());
+        return (new \ReflectionClass($this->modelName))->getShortName();
     }
 
     /**
@@ -237,5 +240,55 @@ class MakeCommand extends GeneratorCommand
         $this->type = $this->qualifyClass($this->controllerName);
 
         return $this->controllerName;
+    }
+
+    private function generateClientPages($path)
+    {
+        $directory = config('admin.client_path') . DIRECTORY_SEPARATOR . "pages" . DIRECTORY_SEPARATOR . $path;
+        if (!file_exists($directory)) {
+            mkdir($directory, 0755, true);
+        }
+        if (!file_exists($directory. DIRECTORY_SEPARATOR . "[id]")) {
+            mkdir($directory . DIRECTORY_SEPARATOR . "[id]", 0755, true);
+        }
+
+        $pages = [
+            'index' => __DIR__.'/stubs/client_pages/index.stub',
+            'show' => __DIR__.'/stubs/client_pages/show.stub',
+            'create' => __DIR__.'/stubs/client_pages/create.stub',
+            'edit' => __DIR__.'/stubs/client_pages/edit.stub'
+        ];
+
+        foreach ($pages as $page => $stub) {
+            $filesystem = new Filesystem();
+            $stubContent = $filesystem->get($stub);
+            
+            $content = str_replace(
+                [
+                    'DummyResourceName',
+                    'DummyPrefix',
+                ],
+                [
+                    $path,
+                    str_replace('api/', '', config('admin.route.prefix')),
+                ],
+                $stubContent
+            );
+
+            switch ($page) {
+                case 'show':
+                    $filePath = $directory . DIRECTORY_SEPARATOR . "[id]" . DIRECTORY_SEPARATOR . 'index.vue';
+                    break;
+                case 'edit':
+                    $filePath = $directory . DIRECTORY_SEPARATOR . "[id]" . DIRECTORY_SEPARATOR . $page . '.vue';
+                    break;
+                default:
+                    $filePath = $directory . DIRECTORY_SEPARATOR . $page . '.vue';
+                    break;
+            }
+            if (!file_exists($filePath)) {
+                file_put_contents($filePath, $content);
+            }
+        }
     }
 }

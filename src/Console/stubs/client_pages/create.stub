@@ -1,0 +1,7 @@
+<script setup lang="ts">
+  import { CrudCreate } from '@/components/ui/crud'
+</script>
+
+<template>
+  <CrudCreate crud-name="DummyResourceName" crud-prefix="DummyPrefix" :isEnableHeader="true"/>
+</template>

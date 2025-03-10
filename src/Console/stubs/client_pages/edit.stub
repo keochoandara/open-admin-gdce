@@ -1,0 +1,7 @@
+<script setup lang="ts">
+  import { CrudEdit } from '@/components/ui/crud'
+</script>
+
+<template>
+  <CrudEdit crud-name="DummyResourceName" crud-prefix="DummyPrefix" :id="$route.params.id"  :isEnableHeader="true" />
+</template>

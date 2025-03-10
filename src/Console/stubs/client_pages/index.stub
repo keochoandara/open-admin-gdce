@@ -1,0 +1,7 @@
+<script setup lang="ts">
+  import { CrudGrid } from '@/components/ui/crud'
+</script>
+
+<template>
+  <CrudGrid crud-name="DummyResourceName" crud-prefix="DummyPrefix" />
+</template>
